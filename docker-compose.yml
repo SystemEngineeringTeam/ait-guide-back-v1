@@ -5,6 +5,7 @@ services:
     image: mysql:8
     volumes:
       - ./docker/mysql/mysqld_charset.cnf:/etc/mysql/conf.d/my.cnf
+    restart: always
     ports:
       - ${MYSQL_PORT}:3306
     environment:
@@ -44,20 +45,21 @@ services:
       start_period: 20s
 
   api:
-      container_name: ${API_CONTAINER_NAME}
-      build:
-        context: .
-        dockerfile: ./docker/api/dockerfile
-      stdin_open: true
-      tty: true
-      volumes:
-        - ./log:/root/log
-      environment:
-        - GIN_MODE=release
-      ports:
-        - ${API_PORT}:8080
-      depends_on:
-        mysql:
-          condition: service_healthy
-        neo4j:
-          condition: service_healthy
+    container_name: ${API_CONTAINER_NAME}
+    build:
+      context: .
+      dockerfile: ./docker/api/dockerfile
+    stdin_open: true
+    tty: true
+    restart: always
+    volumes:
+      - ./log:/root/log
+    environment:
+      - GIN_MODE=release
+    ports:
+      - ${API_PORT}:8080
+    depends_on:
+      mysql:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
